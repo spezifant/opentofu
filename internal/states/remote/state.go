@@ -41,9 +41,11 @@ type State struct {
 	// state has changed from an existing state we read in.
 	lineage, readLineage string
 	serial, readSerial   uint64
+	readEncryption       encryption.EncryptionStatus
 	mu                   sync.Mutex
 	state, readState     *states.State
 	disableLocks         bool
+	needsMigration       bool
 
 	// If this is set then the state manager will decline to store intermediate
 	// state snapshots created while a OpenTofu Core apply operation is in
@@ -176,6 +178,7 @@ func (s *State) refreshState() error {
 	// track changes as lineage, serial and/or state are mutated
 	s.readLineage = stateFile.Lineage
 	s.readSerial = stateFile.Serial
+	s.readEncryption = stateFile.EncryptionStatus
 	s.readState = s.state.DeepCopy()
 	return nil
 }
@@ -192,7 +195,7 @@ func (s *State) PersistState(schemas *tofu.Schemas) error {
 		lineageUnchanged := s.readLineage != "" && s.lineage == s.readLineage
 		serialUnchanged := s.readSerial != 0 && s.serial == s.readSerial
 		stateUnchanged := statefile.StatesMarshalEqual(s.state, s.readState)
-		if stateUnchanged && lineageUnchanged && serialUnchanged {
+		if stateUnchanged && lineageUnchanged && serialUnchanged && s.readEncryption != encryption.StatusMigration {
 			// If the state, lineage or serial haven't changed at all then we have nothing to do.
 			return nil
 		}
