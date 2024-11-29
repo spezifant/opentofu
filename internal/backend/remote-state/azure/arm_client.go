@@ -73,7 +73,7 @@ func buildArmClient(ctx context.Context, config BackendConfig) (*ArmClient, erro
 		CustomResourceManagerEndpoint: config.CustomResourceManagerEndpoint,
 		MetadataHost:                  config.MetadataHost,
 		Environment:                   config.Environment,
-		ClientSecretDocsLink:          "https://registry.opentofu.org/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret",
+		ClientSecretDocsLink:          "https://github.com/opentofu/terraform-provider-azurerm/blob/main/website/docs/guides/service_principal_client_secret.html.markdown",
 
 		// Service Principal (Client Certificate)
 		ClientCertPassword: config.ClientCertificatePassword,
